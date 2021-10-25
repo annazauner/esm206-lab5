@@ -147,3 +147,12 @@ suv_sample <- compact_suv %>%
   
 ```
 
+
+Mean city gas mileages for SUVs and compact cars are the same. 
+
+```{r}
+t.test(compact_sample, suv_sample)
+
+```
+
+What p-value means: If these populations have the same mean gas mileage, there is a 0.0000000022% chance that two random samples have a mean differece of at least 11.393. Therefore, reject the null hypotheses, very unlikely that these are drawn from populations with the same mean gas mileage. There is a significant difference in mean city gas mileage for suvs and compact cars (t(df) = t-statistic, p < 0.001).
