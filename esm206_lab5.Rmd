@@ -51,6 +51,99 @@ Problem - because not reducible
 
 #### Now using in-line referencing
 
-Mean otter length is `r round(otter_ci$estimate, 1)` inches.  
+Mean otter length is `r round(otter_ci$estimate, 1)` inches with a 95% confidence interval of [r round(otter_ci$conf.int[1], 1), round(otter_ci$conf.int[2], 1)`] inches. 
 
+## Part 2: Two-sample t-test
+
+### Example 1
+
+Make two mock samples, and ask the questions: do we have sufficient evidence to make us reject the null hypothesis that these samples were drawn from populationns with the same mean?
+
+```{r}
+# make mock samples
+
+oak_trees <- c(20, 19, 24, 28, 34, 12, 15, 25)
+
+pine_trees <- c(39, 26, 20, 30, 37, 22, 19, 18)
+
+# two-sample t-test
+
+tree_t <- t.test(oak_trees, pine_trees)
+
+# Null hypothesis; mean heights are the same
+# i.e. : Trees are drawn from populations with the same mean height
+```
+
+P-value means: The probability that trees are drawn from populations with the same mean height, the two random samples have this difference in sample means or less, is a 28% chance if taken at random. (start with null hypothesis)
+
+"If these populations have the same mean height, there is a 28% change of taking two random sample with sample means at least this different taken at random."
+
+Therefore, not enough evidence to reject null hypothesis. 
+
+The mean heights of oak and pine trees were (X +/- Y) and (X +/- Y), respectively and the difference was not significant (t(`r round(tree_t$parameter, 1)`) = `r round(tree_t$statistic, 1)`, p = `r round(tree_t$p.value, 1)`)
+
+"t(df) = t-statistic, p = p-value)"
+
+*AVOID* p = 0
+
+when things get really small ( usually p< 0.001)
+
+## Part 3: Another t-test with cars data
+
+Using the `mpg` dataset
+
+### Take a look at the data
+
+```{r}
+compact_suv <- mpg %>% 
+  filter(class %in% c("compact", "suv"))
+
+# check for remaining levels
+
+unique(compact_suv$class)
+
+```
+
+Create a histogram of city gas mileage (city) faceted by class starting from compact_suv
+
+```{r}
+
+ggplot(data = compact_suv, aes(x = cty))+
+  geom_histogram(bins = 12, fill = "blue")+
+  facet_wrap(~class)
+
+ggplot(data = compact_suv, aes(sample = cty))+
+  geom_qq()+
+  facet_wrap(~ class)
+
+
+```
+Grey area justification : given central limits theorem, given t-test and qq test both telling me...therefore.. appropriate way to compare means with t-test
+
+
+Find some summary statistics for each group
+
+```{r}
+car_stats <- compact_suv %>% 
+  group_by(class) %>% 
+  summarize(
+    mean_city = round(mean(cty), 2),
+    sd_city = round(mean(cty), 2),
+    sample_size = n()
+  )
+
+car_stats
+```
+The t.test() function REALLY wants vectors of things. Use the `pull()` function to pull our a vector from a data frame.
+
+```{r}
+compact_sample <- compact_suv %>% 
+  filter(class == "compact") %>% 
+  pull(cty)
+
+suv_sample <- compact_suv %>% 
+  filter(class == "suv") %>% 
+  pull(cty)
+  
+```
 
